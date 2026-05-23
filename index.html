@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ NOM tabla 310 y 250 ⚡</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0b111e;
+            color: #f8fafc;
+            font-family: ui-sans-serif, system-ui, sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-start p-4 sm:p-6">
+
+    <!-- ================= MENÚ DE INICIO (2 SECCIONES) ================= -->
+    <div id="menu-container" class="w-full max-w-2xl mt-8 text-center">
+        <h1 class="text-2xl sm:text-3xl font-bold text-blue-400 mb-6 flex items-center justify-center gap-2">
+            ⚡ NOM tabla 310 y 250 ⚡
+        </h1>
+        <p class="text-sm text-slate-400 mb-8 max-w-md mx-auto">
+            Selecciona la sección técnica que deseas dominar en Modo Supervivencia Infinito. El juego continuará hasta que cometas un error.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Tarjeta Sección 310 -->
+            <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 shadow-xl backdrop-blur-sm flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-100 mb-2">Tabla 310.15(B)(16)</h2>
+                    <p class="text-xs text-slate-400 mb-6">Ampacidad de conductores de cobre en canalizaciones basados en cargas y temperaturas de terminales (60°C / 75°C).</p>
+                </div>
+                <button onclick="startSupervivencia('310')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-xl transition duration-150 shadow-md tracking-wide text-sm">
+                    Estudiar Ampacidad
+                </button>
+            </div>
+
+            <!-- Tarjeta Sección 250 -->
+            <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 shadow-xl backdrop-blur-sm flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-100 mb-2">Tabla 250.122</h2>
+                    <p class="text-xs text-slate-400 mb-6">Calibre mínimo de conductor de puesta a tierra de cobre para equipos basado en la protección contra sobrecorriente.</p>
+                </div>
+                <button onclick="startSupervivencia('250')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl transition duration-150 shadow-md tracking-wide text-sm">
+                    Estudiar Puesta a Tierra
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= CONTENEDOR DEL JUEGO ================= -->
+    <main id="game-container" class="hidden w-full max-w-3xl mt-4 bg-slate-900/40 border border-slate-800/80 p-6 rounded-2xl shadow-2xl backdrop-blur-md">
+        <!-- Encabezado -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 id="game-title" class="text-base sm:text-lg font-bold tracking-tight text-slate-200">Simulador Dinámico NOM</h1>
+            <button onclick="backToMenu()" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-lg transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            </button>
+        </div>
+
+        <div id="quiz-interface">
+            <!-- Requerimiento Objetivo -->
+            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-6 mb-6 flex justify-between items-center">
+                <div>
+                    <span id="req-label" class="text-xs font-bold uppercase tracking-widest text-slate-500 block mb-1">CORRIENTE DICTADA:</span>
+                    <div id="target-value" class="text-3xl font-black text-blue-500 tracking-tight">-- Amperes</div>
+                </div>
+                <div id="target-condition" class="text-2xl font-bold text-slate-300 tracking-wide">--</div>
+            </div>
+            
+            <!-- Matriz Completa de Calibres Comerciales -->
+            <div id="matrix-container" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2.5 mb-6"></div>
+
+            <!-- Estatus de Racha -->
+            <div class="flex justify-between border-t border-slate-800/60 pt-4 text-sm px-1">
+                <div>
+                    <span class="text-slate-500 block text-xs uppercase font-bold">Racha Actual</span>
+                    <span id="score-text" class="text-xl font-black text-amber-400">0 aciertos</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-slate-500 block text-xs uppercase font-bold">Récord Máximo</span>
+                    <span id="best-text" class="text-xl font-black text-emerald-400">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Error (Fin del juego) -->
+        <div id="result-interface" class="hidden text-center py-8">
+            <h2 class="text-2xl font-bold text-rose-500 mb-2">¡Calibre Incorrecto o Sobredimensionado!</h2>
+            <p id="error-feedback" class="text-sm text-slate-400 mb-6 px-4"></p>
+            <div class="text-slate-500 text-xs uppercase font-bold mb-1">Racha alcanzada</div>
+            <div id="final-score" class="text-5xl font-black text-amber-400 tracking-tight mb-8">0</div>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <button onclick="initQuiz()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-xl transition duration-150 shadow-lg">
+                    Intentar de Nuevo
+                </button>
+                <button onclick="backToMenu()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 px-8 rounded-xl transition duration-150">
+                    Ir al Inicio
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const listaCalibres = [
+            "14 AWG", "12 AWG", "10 AWG", "8 AWG", "6 AWG", "4 AWG", "3 AWG", "2 AWG", "1 AWG", 
+            "1/0 AWG", "2/0 AWG", "3/0 AWG", "4/0 AWG", "250 kcmil", "300 kcmil", "350 kcmil", "400 kcmil", "500 kcmil"
+        ];
+
+        const tabla310 = [
+            { calibre: "14 AWG", "60": 15, "75": 20 }, { calibre: "12 AWG", "60": 20, "75": 25 },
+            { calibre: "10 AWG", "60": 30, "75": 35 }, { calibre: "8 AWG",  "60": 40, "75": 50 },
+            { calibre: "6 AWG",  "60": 55, "75": 65 }, { calibre: "4 AWG",  "60": 70, "75": 85 },
+            { calibre: "3 AWG",  "60": 85, "75": 100 }, { calibre: "2 AWG",  "60": 95, "75": 115 },
+            { calibre: "1 AWG",  "60": 110, "75": 130 }, { calibre: "1/0 AWG", "60": 125, "75": 150 },
+            { calibre: "2/0 AWG", "60": 145, "75": 175 }, { calibre: "3/0 AWG", "60": 165, "75": 200 },
+            { calibre: "4/0 AWG", "60": 195, "75": 230 }, { calibre: "250 kcmil", "60": 215, "75": 255 },
+            { calibre: "300 kcmil", "60": 240, "75": 285 }, { calibre: "350 kcmil", "60": 260, "75": 310 },
+            { calibre: "400 kcmil", "60": 280, "75": 335 }, { calibre: "500 kcmil", "60": 320, "75": 380 }
+        ];
+
+        const tabla250 = [
+            { calibre: "14 AWG", maxAmperes: 15 }, { calibre: "12 AWG", maxAmperes: 20 },
+            { calibre: "10 AWG", maxAmperes: 60 }, { calibre: "8 AWG",  maxAmperes: 100 },
+            { calibre: "6 AWG",  maxAmperes: 200 }, { calibre: "4 AWG",  maxAmperes: 300 },
+            { calibre: "3 AWG",  maxAmperes: 400 }, { calibre: "2 AWG",  maxAmperes: 500 },
+            { calibre: "1 AWG",  maxAmperes: 600 }, { calibre: "1/0 AWG", maxAmperes: 800 },
+            { calibre: "2/0 AWG", maxAmperes: 1000 }, { calibre: "3/0 AWG", maxAmperes: 1200 },
+            { calibre: "4/0 AWG", maxAmperes: 1600 }, { calibre: "250 kcmil", maxAmperes: 2000 },
+            { calibre: "350 kcmil", maxAmperes: 3000 }, { calibre: "400 kcmil", maxAmperes: 4000 },
+            { calibre: "500 kcmil", maxAmperes: 6000 }
+        ];
+
+        let modeActive = "310"; 
+        let racha = 0;
+        let record310 = 0;
+        let record250 = 0;
+        
+        let corrienteActual = 0;
+        let tempActual = "60";
+        let respuestaCorrecta = "";
+
+        function startSupervivencia(tipo) {
+            modeActive = tipo;
+            document.getElementById("menu-container").classList.add("hidden");
+            document.getElementById("game-container").classList.remove("hidden");
+            initQuiz();
+        }
+
+        function backToMenu() {
+            document.getElementById("game-container").classList.add("hidden");
+            document.getElementById("menu-container").classList.remove("hidden");
+        }
+
+        function initQuiz() {
+            racha = 0;
+            document.getElementById("quiz-interface").classList.remove("hidden");
+            document.getElementById("result-interface").classList.add("hidden");
+            document.getElementById("score-text").innerText = `${racha} aciertos`;
+            
+            let currentRecord = modeActive === "310" ? record310 : record250;
+            document.getElementById("best-text").innerText = currentRecord;
+
+            renderButtons();
+            generarEjercicioInfinito();
+        }
+
+        function renderButtons() {
+            const container = document.getElementById("matrix-container");
+            container.innerHTML = "";
+            listaCalibres.forEach(calibre => {
+                const btn = document.createElement("button");
+                btn.className = "w-full text-center bg-blue-600 hover:bg-blue-500 font-bold py-3.5 rounded-xl transition text-white shadow-md text-sm tracking-wide focus:outline-none";
+                btn.innerText = calibre;
+                btn.onclick = () => verificarRespuesta(calibre, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function generarEjercicioInfinito() {
+            if (modeActive === "310") {
+                document.getElementById("game-title").innerText = "Simulador NOM - Tabla 310.15(B)(16)";
+                document.getElementById("req-label").innerText = "CORRIENTE DE CARGA:";
+                
+                tempActual = Math.random() > 0.5 ? "60" : "75";
+                corrienteActual = Math.floor(Math.random() * 370) + 5; 
+                document.getElementById("target-condition").innerText = `${tempActual}°C (Cu)`;
+
+                for (let i = 0; i < tabla310.length; i++) {
+                    if (tabla310[i][tempActual] >= corrienteActual) {
+                        respuestaCorrecta = tabla310[i].calibre;
+                        break;
+                    }
+                }
+            } else {
+                document.getElementById("game-title").innerText = "Simulador NOM - Tabla 250.122";
+                document.getElementById("req-label").innerText = "PROTECCIÓN DEL CIRCUITO (ITM/FUSIBLE):";
+                
+                corrienteActual = Math.floor(Math.random() * 5900) + 10;
+                document.getElementById("target-condition").innerText = "Tierra de Cobre (Cu)";
+
+                for (let i = 0; i < tabla250.length; i++) {
+                    if (tabla250[i].maxAmperes >= corrienteActual) {
+                        respuestaCorrecta = tabla250[i].calibre;
+                        break;
+                    }
+                }
+            }
+
+            document.getElementById("target-value").innerText = `${corrienteActual} Amperes`;
+        }
+
+        function verificarRespuesta(calibreSeleccionado, clickedBtn) {
+            const botones = document.getElementById("matrix-container").getElementsByTagName("button");
+            for (let b of botones) { b.disabled = true; }
+
+            if (calibreSeleccionado === respuestaCorrecta) {
+                racha++;
+                if (modeActive === "310") {
+                    if (racha > record310) { record310 = racha; }
+                    document.getElementById("best-text").innerText = record310;
+                } else {
+                    if (racha > record250) { record250 = racha; }
+                    document.getElementById("best-text").innerText = record250;
+                }
+                
+                document.getElementById("score-text").innerText = `${racha} aciertos`;
+                clickedBtn.className = "w-full text-center py-3.5 rounded-xl font-bold text-sm transition bg-emerald-600 border border-emerald-400 text-white shadow-lg";
+                
+                setTimeout(() => {
+                    renderButtons();
+                    generarEjercicioInfinito();
+                }, 800);
+            } else {
+                clickedBtn.className = "w-full text-center py-3.5 rounded-xl font-bold text-sm transition bg-rose-600 border border-rose-400 text-white shadow-lg";
+                
+                for (let b of botones) {
+                    if (b.innerText === respuestaCorrecta) {
+                        b.className = "w-full text-center py-3.5 rounded-xl font-bold text-sm transition bg-emerald-600/90 text-white";
+                    }
+                }
+
+                setTimeout(() => {
+                    showFinalResults(calibreSeleccionado);
+                }, 1200);
+            }
+        }
+
+        function showFinalResults(fallado) {
+            document.getElementById("quiz-interface").classList.add("hidden");
+            document.getElementById("result-interface").classList.remove("hidden");
+            document.getElementById("final-score").innerText = racha;
+            
+            let retroalimentacion = "";
+            if (modeActive === "310") {
+                let limite = tabla310.find(item => item.calibre === respuestaCorrecta)[tempActual];
+                retroalimentacion = `Para una carga de <b class="text-blue-400">${corrienteActual} A</b> a <b class="text-slate-200">${tempActual}°C</b>, el calibre conductor correcto es <b class="text-emerald-400">${respuestaCorrecta}</b> (soporta hasta ${limite} A). Seleccionaste ${fallado}.`;
+            } else {
+                let limite = tabla250.find(item => item.calibre === respuestaCorrecta).maxAmperes;
+                retroalimentacion = `Para un interruptor de protección de <b class="text-blue-400">${corrienteActual} A</b>, el calibre mínimo para el cable de tierra física de cobre es <b class="text-emerald-400">${respuestaCorrecta}</b> (válido hasta un límite de ${limite} A). Seleccionaste ${fallado}.`;
+            }
+            
+            document.getElementById("error-feedback").innerHTML = retroalimentacion;
+        }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').then(reg => reg.update()).catch(err => console.log(err));
+            });
+        }
+    </script>
+</body>
+</html>
