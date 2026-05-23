@@ -1,0 +1,16 @@
+{
+  "short_name": "NOM Simulador",
+  "name": "⚡ NOM tabla 310 y 250 ⚡",
+  "icons": [
+    {
+      "src": "icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#0b111e",
+  "theme_color": "#0b111e",
+  "display": "standalone",
+  "orientation": "portrait"
+}
