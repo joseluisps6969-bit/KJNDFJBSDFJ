@@ -17,13 +17,10 @@
 <body class="min-h-screen flex flex-col items-center justify-start p-4 sm:p-6">
 
     <!-- ================= MENÚ DE INICIO (2 SECCIONES) ================= -->
-    <div id="menu-container" class="w-full max-w-2xl mt-8 text-center">
-        <h1 class="text-2xl sm:text-3xl font-bold text-blue-400 mb-6 flex items-center justify-center gap-2">
+    <div id="menu-container" class="w-full max-w-2xl mt-12 text-center">
+        <h1 class="text-2xl sm:text-3xl font-bold text-blue-400 mb-8 flex items-center justify-center gap-2">
             ⚡ NOM tabla 310 y 250 ⚡
         </h1>
-        <p class="text-sm text-slate-400 mb-8 max-w-md mx-auto">
-            Selecciona la sección técnica que deseas dominar en Modo Supervivencia Infinito. El juego continuará hasta que cometas un error.
-        </p>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <!-- Tarjeta Sección 310 -->
@@ -53,11 +50,11 @@
 
     <!-- ================= CONTENEDOR DEL JUEGO ================= -->
     <main id="game-container" class="hidden w-full max-w-3xl mt-4 bg-slate-900/40 border border-slate-800/80 p-6 rounded-2xl shadow-2xl backdrop-blur-md">
-        <!-- Encabezado -->
+        <!-- Encabezado con botón de Terminar Juego -->
         <div class="flex justify-between items-center mb-6">
             <h1 id="game-title" class="text-base sm:text-lg font-bold tracking-tight text-slate-200">Simulador Dinámico NOM</h1>
-            <button onclick="backToMenu()" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-lg transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            <button onclick="forzarFinJuego()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold py-1.5 px-3.5 rounded-lg text-xs transition duration-100 shadow-md flex items-center gap-1">
+                🛑 Terminar Juego
             </button>
         </div>
 
@@ -87,15 +84,15 @@
             </div>
         </div>
 
-        <!-- Pantalla de Error (Fin del juego) -->
+        <!-- Pantalla de Resultados Finales / Salida Voluntaria -->
         <div id="result-interface" class="hidden text-center py-8">
-            <h2 class="text-2xl font-bold text-rose-500 mb-2">¡Calibre Incorrecto o Sobredimensionado!</h2>
+            <h2 id="result-title" class="text-2xl font-bold text-rose-500 mb-2">¡Juego Terminado!</h2>
             <p id="error-feedback" class="text-sm text-slate-400 mb-6 px-4"></p>
             <div class="text-slate-500 text-xs uppercase font-bold mb-1">Racha alcanzada</div>
             <div id="final-score" class="text-5xl font-black text-amber-400 tracking-tight mb-8">0</div>
             <div class="flex flex-col sm:flex-row gap-3 justify-center">
                 <button onclick="initQuiz()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-xl transition duration-150 shadow-lg">
-                    Intentar de Nuevo
+                    Iniciar Nuevo Viaje
                 </button>
                 <button onclick="backToMenu()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 px-8 rounded-xl transition duration-150">
                     Ir al Inicio
@@ -244,26 +241,41 @@
                 }
 
                 setTimeout(() => {
-                    showFinalResults(calibreSeleccionado);
+                    showFinalResults(calibreSeleccionado, false);
                 }, 1200);
             }
         }
 
-        function showFinalResults(fallado) {
+        function forzarFinJuego() {
+            showFinalResults("", true);
+        }
+
+        function showFinalResults(fallado, fueForzado) {
             document.getElementById("quiz-interface").classList.add("hidden");
             document.getElementById("result-interface").classList.remove("hidden");
             document.getElementById("final-score").innerText = racha;
             
-            let retroalimentacion = "";
-            if (modeActive === "310") {
-                let limite = tabla310.find(item => item.calibre === respuestaCorrecta)[tempActual];
-                retroalimentacion = `Para una carga de <b class="text-blue-400">${corrienteActual} A</b> a <b class="text-slate-200">${tempActual}°C</b>, el calibre conductor correcto es <b class="text-emerald-400">${respuestaCorrecta}</b> (soporta hasta ${limite} A). Seleccionaste ${fallado}.`;
+            const titleElement = document.getElementById("result-title");
+            const feedbackElement = document.getElementById("error-feedback");
+
+            if (fueForzado) {
+                titleElement.innerText = "Juego Concluido";
+                titleElement.className = "text-2xl font-bold text-blue-400 mb-2";
+                feedbackElement.innerHTML = `Has decidido terminar la sesión de estudio de manera voluntaria. ¡Buen entrenamiento técnico!`;
             } else {
-                let limite = tabla250.find(item => item.calibre === respuestaCorrecta).maxAmperes;
-                retroalimentacion = `Para un interruptor de protección de <b class="text-blue-400">${corrienteActual} A</b>, el calibre mínimo para el cable de tierra física de cobre es <b class="text-emerald-400">${respuestaCorrecta}</b> (válido hasta un límite de ${limite} A). Seleccionaste ${fallado}.`;
+                titleElement.innerText = "¡Calibre Incorrecto!";
+                titleElement.className = "text-2xl font-bold text-rose-500 mb-2";
+                
+                let retroalimentacion = "";
+                if (modeActive === "310") {
+                    let limite = tabla310.find(item => item.calibre === respuestaCorrecta)[tempActual];
+                    retroalimentacion = `Para una carga de <b class="text-blue-400">${corrienteActual} A</b> a <b class="text-slate-200">${tempActual}°C</b>, el calibre conductor correcto es <b class="text-emerald-400">${respuestaCorrecta}</b> (soporta hasta ${limite} A). Seleccionaste ${fallado}.`;
+                } else {
+                    let limite = tabla250.find(item => item.calibre === respuestaCorrecta).maxAmperes;
+                    retroalimentacion = `Para un interruptor de protección de <b class="text-blue-400">${corrienteActual} A</b>, el calibre mínimo para el cable de tierra física de cobre es <b class="text-emerald-400">${respuestaCorrecta}</b> (válido hasta un límite de ${limite} A). Seleccionaste ${fallado}.`;
+                }
+                feedbackElement.innerHTML = retroalimentacion;
             }
-            
-            document.getElementById("error-feedback").innerHTML = retroalimentacion;
         }
 
         if ('serviceWorker' in navigator) {
